@@ -45,6 +45,15 @@ class Money {
     Object.freeze(this)
   }
 
+  static fromAmount(amount, currency, customCurrencies = undefined) {
+    if (isString(currency)) currency = fetchCurrencyData(customCurrencies, currency)
+    if (!isPlainObject(currency)) throw new TypeError('Invalid currency')
+
+    testInteger(amount)
+
+    return new this(amount * currency.subunit_to_unit, currency.iso_code, customCurrencies)
+  }
+
   get amount() {
     return this.cents / this.currencyData.subunit_to_unit
   }

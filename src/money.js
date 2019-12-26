@@ -62,16 +62,13 @@ class Money {
     return fetchCurrencyData(this.customCurrencies, this.currency)
   }
 
-  format(options = {}) {
-    let result = this.amount.toLocaleString()
+  format(options = { withSymbol: null, zeroSymbol: null }) {
+    if (this.isZero() && options['zeroSymbol']) return options['zeroSymbol']
+    if (!options['withSymbol']) return this.amount.toLocaleString()
 
-    if (options['withSymbol']) {
-      result = this.currencyData.symbol_first
-        ? `${this.currencyData.symbol}${result}`
-        : `${result}${this.currencyData.symbol}`
-    }
-
-    return result
+    return this.currencyData.symbol_first
+      ? `${this.currencyData.symbol}${this.amount.toLocaleString()}`
+      : `${this.amount.toLocaleString()}${this.currencyData.symbol}`
   }
 
   equals(other) {

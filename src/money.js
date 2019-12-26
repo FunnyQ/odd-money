@@ -5,37 +5,42 @@ import isPlainObject from 'lodash.isplainobject'
 import isString from 'lodash.isstring'
 import defaultCurrencies from './currency_iso'
 
-let isInteger = function(n) {
+const isInteger = function(n) {
   return Number(n) === n && n % 1 === 0
 }
 
-let testSameCurrency = function(left, right) {
+const testSameCurrency = function(left, right) {
   if (left.currency !== right.currency) throw new Error('not same currency')
 }
 
-let testInteger = n => {
+const testInteger = n => {
   if (!isInteger(n)) throw new TypeError('not an integer')
 }
 
-let testMoneyInstance = function(other) {
+const testMoneyInstance = function(other) {
   if (!(other instanceof Money)) throw new TypeError('not Money instance')
 }
 
-let testOperand = function(operand) {
+const testOperand = function(operand) {
   if (isNaN(parseFloat(operand)) && !isFinite(operand)) throw new TypeError('operand not a number')
 }
 
-export default class Money {
-  constructor(cents, currency, currencies = defaultCurrencies) {
-    if (isString(currency)) currency = currencies[currency]
+const fetchCurrencyData = (customCurrencies, targetCurrency) => {
+  if (customCurrencies) return customCurrencies[targetCurrency] || defaultCurrencies[targetCurrency]
+
+  return defaultCurrencies[targetCurrency]
+}
+
+class Money {
+  constructor(cents, currency, customCurrencies = undefined) {
+    if (isString(currency)) currency = fetchCurrencyData(customCurrencies, currency)
     if (!isPlainObject(currency)) throw new TypeError('Invalid currency')
 
     testInteger(cents)
 
     this.cents = cents
     this.currency = currency.iso_code
-
-    assignIn(this, currencies)
+    this.customCurrencies = customCurrencies
 
     Object.freeze(this)
   }
@@ -45,7 +50,7 @@ export default class Money {
   }
 
   get currencyData() {
-    return this[this.currency]
+    return fetchCurrencyData(this.customCurrencies, this.currency)
   }
 
   format(options = {}) {
@@ -70,14 +75,14 @@ export default class Money {
     testMoneyInstance(other)
     testSameCurrency(this, other)
 
-    return new Money(this.cents + other.cents, this.currency)
+    return new Money(this.cents + other.cents, this.currency, this.customCurrencies)
   }
 
   substract(other) {
     testMoneyInstance(other)
     testSameCurrency(this, other)
 
-    return new Money(this.cents - other.cents, this.currency)
+    return new Money(this.cents - other.cents, this.currency, this.customCurrencies)
   }
 
   multiply(multiplier, rounder = Math.round) {
@@ -86,7 +91,7 @@ export default class Money {
 
     const result = rounder(this.cents * multiplier)
 
-    return new Money(result, this.currency)
+    return new Money(result, this.currency, this.customCurrencies)
   }
 
   divide(divisor, rounder = Math.round) {
@@ -95,7 +100,7 @@ export default class Money {
 
     const result = rounder(this.cents / divisor)
 
-    return new Money(result, this.currency)
+    return new Money(result, this.currency, this.customCurrencies)
   }
 
   allocate(ratios) {
@@ -132,3 +137,5 @@ export default class Money {
     return this.cents < 0
   }
 }
+
+export default assignIn(Money, defaultCurrencies)

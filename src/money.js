@@ -63,6 +63,14 @@ class Money {
     return fetchCurrencyData(this.customCurrencies, this.currency)
   }
 
+  get roundPrecision() {
+    const precision_string = String(this.currencyData.smallest_denomination / this.currencyData.subunit_to_unit).split(
+      '.'
+    )[1]
+
+    return precision_string ? precision_string.length : 0
+  }
+
   format(options = { withSymbol: null, zeroSymbol: null }) {
     if (this.isZero() && options['zeroSymbol']) return options['zeroSymbol']
     if (!options['withSymbol']) return this.amount.toLocaleString()
@@ -96,8 +104,7 @@ class Money {
     if (!isFunction(rounder)) throw new TypeError('rounder must be a function')
     testOperand(multiplier)
 
-    const result =
-      rounder(this.amount * multiplier, this.currencyData.smallest_denomination) * this.currencyData.subunit_to_unit
+    const result = rounder(this.amount * multiplier, this.roundPrecision) * this.currencyData.subunit_to_unit
 
     return new Money(result, this.currency, this.customCurrencies)
   }
@@ -106,8 +113,7 @@ class Money {
     if (!isFunction(rounder)) throw new TypeError('rounder must be a function')
     testOperand(divisor)
 
-    const result =
-      rounder(this.amount / divisor, this.currencyData.smallest_denomination) * this.currencyData.subunit_to_unit
+    const result = rounder(this.amount / divisor, this.roundPrecision) * this.currencyData.subunit_to_unit
 
     return new Money(result, this.currency, this.customCurrencies)
   }

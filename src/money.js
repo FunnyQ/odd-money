@@ -3,6 +3,7 @@ import isFunction from 'lodash.isfunction'
 import isNaN from 'lodash.isnan'
 import isPlainObject from 'lodash.isplainobject'
 import isString from 'lodash.isstring'
+import round from 'lodash.round'
 import defaultCurrencies from './currency_iso'
 
 const isInteger = function(n) {
@@ -91,20 +92,22 @@ class Money {
     return new Money(this.cents - other.cents, this.currency, this.customCurrencies)
   }
 
-  multiply(multiplier, rounder = Math.round) {
+  multiply(multiplier, rounder = round) {
     if (!isFunction(rounder)) throw new TypeError('rounder must be a function')
     testOperand(multiplier)
 
-    const result = rounder(this.cents * multiplier)
+    const result =
+      rounder(this.amount * multiplier, this.currencyData.smallest_denomination) * this.currencyData.subunit_to_unit
 
     return new Money(result, this.currency, this.customCurrencies)
   }
 
-  divide(divisor, rounder = Math.round) {
+  divide(divisor, rounder = round) {
     if (!isFunction(rounder)) throw new TypeError('rounder must be a function')
     testOperand(divisor)
 
-    const result = rounder(this.cents / divisor)
+    const result =
+      rounder(this.amount / divisor, this.currencyData.smallest_denomination) * this.currencyData.subunit_to_unit
 
     return new Money(result, this.currency, this.customCurrencies)
   }

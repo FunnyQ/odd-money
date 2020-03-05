@@ -1,6 +1,6 @@
 {
   "name": "odd-money",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "description": "handling money data type from our own backend.",
   "main": "lib/money.js",
   "scripts": {

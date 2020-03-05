@@ -64,11 +64,11 @@ class Money {
   }
 
   get roundPrecision() {
-    const precision_string = String(this.currencyData.smallest_denomination / this.currencyData.subunit_to_unit).split(
+    const precisionString = String(this.currencyData.smallest_denomination / this.currencyData.subunit_to_unit).split(
       '.'
     )[1]
 
-    return precision_string ? precision_string.length : 0
+    return precisionString ? precisionString.length : 0
   }
 
   format(options = { withSymbol: null, zeroSymbol: null }) {

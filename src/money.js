@@ -5,24 +5,25 @@ import isPlainObject from 'lodash.isplainobject'
 import isString from 'lodash.isstring'
 import round from 'lodash.round'
 import defaultCurrencies from './currency_iso'
+import numberPrecision from 'number-precision'
 
-const isInteger = function(n) {
+const isInteger = function (n) {
   return Number(n) === n && n % 1 === 0
 }
 
-const testSameCurrency = function(left, right) {
+const testSameCurrency = function (left, right) {
   if (left.currency !== right.currency) throw new Error('not same currency')
 }
 
-const testInteger = n => {
+const testInteger = (n) => {
   if (!isInteger(n)) throw new TypeError('not an integer')
 }
 
-const testMoneyInstance = function(other) {
+const testMoneyInstance = function (other) {
   if (!(other instanceof Money)) throw new TypeError('not Money instance')
 }
 
-const testOperand = function(operand) {
+const testOperand = function (operand) {
   if (isNaN(parseFloat(operand)) && !isFinite(operand)) throw new TypeError('operand not a number')
 }
 
@@ -37,9 +38,10 @@ class Money {
     if (isString(currency)) currency = fetchCurrencyData(customCurrencies, currency)
     if (!isPlainObject(currency)) throw new TypeError('Invalid currency')
 
-    testInteger(cents)
+    this.cents = numberPrecision.strip(cents)
 
-    this.cents = cents
+    testInteger(this.cents)
+
     this.currency = currency.iso_code
     this.customCurrencies = customCurrencies
 
@@ -123,7 +125,7 @@ class Money {
     let results = []
     let total = ratios.reduce((total, ratio) => total + ratio)
 
-    ratios.forEach(ratio => {
+    ratios.forEach((ratio) => {
       let shareUnit = Math.floor(this.cents * (ratio / total))
 
       results.push(shareUnit)
@@ -137,7 +139,7 @@ class Money {
       }
     })
 
-    return results.map(result => new Money(result, this.currency))
+    return results.map((result) => new Money(result, this.currency))
   }
 
   isZero() {

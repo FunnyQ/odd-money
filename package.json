@@ -1,6 +1,6 @@
 {
   "name": "odd-money",
-  "version": "0.1.5",
+  "version": "0.1.6",
   "description": "handling money data type from our own backend.",
   "main": "lib/money.js",
   "scripts": {
@@ -41,6 +41,7 @@
     "lodash.isnan": "^3.0.2",
     "lodash.isplainobject": "^4.0.6",
     "lodash.isstring": "^4.0.1",
-    "lodash.round": "^4.0.4"
+    "lodash.round": "^4.0.4",
+    "number-precision": "^1.5.1"
   }
 }
